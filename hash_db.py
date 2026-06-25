@@ -1,4 +1,3 @@
-# hash_db.py — HashPilot Phase 1
 # Hash prototype database with regex, hashcat modes, weights, and context tags
 
 import re
@@ -11,7 +10,7 @@ class HashPrototype:
     regex: re.Pattern
     hashcat_mode: Optional[int]
     john_format: Optional[str]
-    weight: int          # 1-100: how commonly seen in the wild
+    weight: int          # 1-100: how commonly the hash is seen around the internet
     tags: List[str]      # context tags: web, linux, windows, ctf, database
     description: str     # one-line human-readable note
 

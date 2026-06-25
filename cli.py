@@ -1,4 +1,3 @@
-# cli.py — HashPilot Phase 1
 # CLI entry point. Run: python cli.py <hash>
 # Uses only Python stdlib (no rich yet — that comes in Phase 4)
 

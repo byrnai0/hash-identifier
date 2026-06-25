@@ -1,4 +1,3 @@
-# matcher.py — HashPilot Phase 1
 # Core matching engine: takes a hash string, returns ranked candidates
 
 from hash_db import HASH_PROTOTYPES, HashPrototype
