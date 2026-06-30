@@ -24,7 +24,7 @@ HASH_PROTOTYPES = [
         hashcat_mode=0,
         john_format="raw-md5",
         weight=95,
-        tags=["web", "linux", "ctf", "database", "windows"],
+        tags=["web", "linux", "ctf", "database"],
         description="Most common hash. Used in legacy web apps, checksums, CTFs."
     ),
     HashPrototype(
@@ -146,7 +146,7 @@ HASH_PROTOTYPES = [
         regex=re.compile(r'^[a-fA-F0-9]{64}$'),
         hashcat_mode=17800,
         john_format=None,
-        weight=20,
+        weight=35,
         tags=["ctf", "web"],
         description="Pre-standardization SHA-3. Used in Ethereum."
     ),
@@ -326,6 +326,24 @@ HASH_PROTOTYPES = [
         weight=20,
         tags=["ctf", "linux"],
         description="BLAKE2b produces 128 hex chars. Modern, fast hash."
+    ),
+    HashPrototype(
+        name="BLAKE2s-256",
+        regex=re.compile(r'^[a-fA-F0-9]{64}$'),
+        hashcat_mode=None,
+        john_format=None,
+        weight=25,
+        tags=["ctf", "linux"],
+        description="BLAKE2s variant optimised for 32-bit systems. 64 hex chars."
+    ),
+    HashPrototype(
+        name="Blake2b-256",
+        regex=re.compile(r'^[a-fA-F0-9]{64}$'),
+        hashcat_mode=None,
+        john_format=None,
+        weight=20,
+        tags=["ctf", "linux"],
+        description="BLAKE2b truncated to 256 bits. 64 hex chars."
     ),
     HashPrototype(
         name="HMAC-SHA256",

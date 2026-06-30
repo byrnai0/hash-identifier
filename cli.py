@@ -1,25 +1,31 @@
-# CLI entry point. Run: python cli.py <hash>
-# Uses only Python stdlib (no rich yet — that comes in Phase 4)
+# cli.py — HashPilot Phase 3
+# Added: --file and --hint flags
 
-import sys
 import argparse
 from matcher import HashMatcher
+from scorer import VALID_CONTEXTS
+from hints import VALID_HINTS
 
-# ─── BANNER ───────────────────────────────────────────────────────────────────
 BANNER = r"""
   _  _         _    ___ _ _     _
  | || |__ _ __| |_ | _ (_) |___| |_
  | __ / _` (_-< ' \|  _/ | / _ \  _|
  |_||_\__,_/__/_||_|_| |_|_\___/\__|
 
-  Hash Identifier v0.1  |  Phase 1 Build
-  ----------------------------------------
+  HashPilot v0.3  |  Phase 3 — File Input + App Hints
+  ------------------------------------------------------
 """
 
-# ─── DISPLAY ──────────────────────────────────────────────────────────────────
-def print_results(hash_input: str, results: list):
-    print(f"\n  Input  : {hash_input}")
-    print(f"  Length : {len(hash_input.strip())} characters\n")
+
+def print_results(hash_input: str, results: list,
+                  context: str = None, hint: str = None):
+    print(f"\n  Input   : {hash_input}")
+    print(f"  Length  : {len(hash_input.strip())} characters")
+    if context:
+        print(f"  Context : {context}")
+    if hint:
+        print(f"  Hint    : {hint}")
+    print()
 
     if not results:
         print("  [!] No matching hash type found.")
@@ -28,59 +34,105 @@ def print_results(hash_input: str, results: list):
 
     print(f"  Found {len(results)} possible match(es):\n")
     print(f"  {'#':<4} {'Hash Name':<30} {'Score':<8} {'Hashcat':<10} {'John':<18} Tags")
-    print("  " + "-" * 85)
+    print("  " + "-" * 88)
 
     for i, r in enumerate(results, 1):
         mode   = str(r.hashcat_mode) if r.hashcat_mode is not None else "—"
         john   = r.john_format if r.john_format else "—"
         tags   = ", ".join(r.tags)
-        marker = " <-- most likely" if i == 1 else ""
+        marker = "  <-- most likely" if i == 1 else ""
         print(f"  {i:<4} {r.name:<30} {r.score:<8} {mode:<10} {john:<18} {tags}{marker}")
 
-    print()
-    print(f"  [i] Description of top match:")
-    print(f"      {results[0].description}\n")
+    print(f"\n  [i] {results[0].description}\n")
 
 
-# ─── ARGUMENT PARSER ──────────────────────────────────────────────────────────
+def process_file(filepath: str, matcher: HashMatcher,
+                 context: str, hint: str):
+    """Read a file of hashes (one per line) and identify each one."""
+    try:
+        with open(filepath, "r") as f:
+            lines = [line.strip() for line in f if line.strip()
+                     and not line.startswith("#")]
+    except FileNotFoundError:
+        print(f"\n  [!] File not found: {filepath}\n")
+        return
+
+    if not lines:
+        print("\n  [!] File is empty or has no valid hash lines.\n")
+        return
+
+    print(f"\n  Processing {len(lines)} hash(es) from '{filepath}'...\n")
+    print("  " + "=" * 88)
+
+    for hash_input in lines:
+        results = matcher.match(hash_input, context=context, hint=hint)
+        print_results(hash_input, results, context=context, hint=hint)
+        print("  " + "-" * 88)
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="hashpilot",
-        description="HashPilot — identify hash types with confidence scoring",
-        formatter_class=argparse.RawTextHelpFormatter
+        description="HashPilot — identify hash types with confidence scoring"
     )
     parser.add_argument(
         "hash",
         nargs="?",
-        help="The hash string to identify"
+        help="Single hash string to identify"
+    )
+    parser.add_argument(
+        "--file", "-f",
+        metavar="FILE",
+        help="Path to a .txt file with one hash per line"
+    )
+    parser.add_argument(
+        "--context", "-c",
+        choices=VALID_CONTEXTS,
+        default=None,
+        help=f"Where the hash was found: {', '.join(VALID_CONTEXTS)}"
+    )
+    parser.add_argument(
+        "--hint",
+        choices=VALID_HINTS,
+        default=None,
+        help=f"Application that generated the hash: {', '.join(VALID_HINTS)}"
     )
     parser.add_argument(
         "--no-banner",
         action="store_true",
-        help="Suppress the ASCII banner"
+        help="Suppress banner"
     )
     return parser
 
 
-# ─── MAIN LOOP ────────────────────────────────────────────────────────────────
 def main():
-    parser = build_parser()
-    args = parser.parse_args()
-
+    parser  = build_parser()
+    args    = parser.parse_args()
     matcher = HashMatcher()
 
     if not args.no_banner:
         print(BANNER)
 
-    # If hash passed as argument, run once and exit
-    if args.hash:
-        results = matcher.match(args.hash)
-        print_results(args.hash, results)
+    # File mode
+    if args.file:
+        process_file(args.file, matcher,
+                     context=args.context, hint=args.hint)
         return
 
-    # Interactive mode: keep asking for hashes until user types 'exit'
+    # Single hash argument mode
+    if args.hash:
+        results = matcher.match(args.hash,
+                                context=args.context,
+                                hint=args.hint)
+        print_results(args.hash, results,
+                      context=args.context, hint=args.hint)
+        return
+
+    # Interactive mode
     print("  Interactive mode — type a hash and press Enter.")
-    print("  Type 'exit' or press Ctrl+C to quit.\n")
+    print(f"  Tip: run with --context [{'/'.join(VALID_CONTEXTS)}] for smarter results.")
+    print(f"  Tip: run with --hint [{'/'.join(VALID_HINTS)}] to boost app-specific hashes.")
+    print("  Type 'exit' to quit.\n")
 
     while True:
         try:
@@ -96,8 +148,11 @@ def main():
         if not user_input:
             continue
 
-        results = matcher.match(user_input)
-        print_results(user_input, results)
+        results = matcher.match(user_input,
+                                context=args.context,
+                                hint=args.hint)
+        print_results(user_input, results,
+                      context=args.context, hint=args.hint)
 
 
 if __name__ == "__main__":

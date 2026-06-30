@@ -1,9 +1,11 @@
-# Core matching engine: takes a hash string, returns ranked candidates
+# matcher.py — HashPilot Phase 3
+# Added: hint parameter threading
 
 from hash_db import HASH_PROTOTYPES, HashPrototype
-from typing import List, Tuple
+from scorer import compute_score
+from typing import List, Optional
 
-# ─── RESULT OBJECT ────────────────────────────────────────────────────────────
+
 class MatchResult:
     def __init__(self, prototype: HashPrototype, score: int):
         self.name         = prototype.name
@@ -11,62 +13,55 @@ class MatchResult:
         self.john_format  = prototype.john_format
         self.description  = prototype.description
         self.tags         = prototype.tags
-        self.score        = score  # confidence score 0-100
+        self.score        = score
 
     def __repr__(self):
         mode = str(self.hashcat_mode) if self.hashcat_mode is not None else "N/A"
-        return (f"MatchResult(name={self.name!r}, "
-                f"score={self.score}, "
-                f"hashcat={mode})")
+        return f"MatchResult(name={self.name!r}, score={self.score}, hashcat={mode})"
 
 
-# ─── MATCHER CLASS ────────────────────────────────────────────────────────────
 class HashMatcher:
-    """
-    Phase 1 engine: regex matching + base-weight ranking.
-    Phase 2 will extend this with context multipliers.
-    """
 
-    def match(self, hash_input: str) -> List[MatchResult]:
-        """
-        Run the hash string against all prototypes.
-        Returns a list of MatchResult objects sorted by score (highest first).
-        """
+    def match(self, hash_input: str,
+              context: Optional[str] = None,
+              hint: Optional[str] = None) -> List[MatchResult]:
+
         hash_input = hash_input.strip()
-
         if not hash_input:
             return []
 
         candidates = []
-
         for prototype in HASH_PROTOTYPES:
             if prototype.regex.fullmatch(hash_input):
-                # Phase 1: score = base weight only
-                # Phase 2 will multiply by a context factor
-                score = prototype.weight
+                score = compute_score(
+                    prototype.weight,
+                    prototype.name,       # Phase 3: pass name for hint lookup
+                    prototype.tags,
+                    context=context,
+                    hint=hint
+                )
                 candidates.append(MatchResult(prototype, score))
 
-        # Sort by score descending, then alphabetically for tie consistency
         candidates.sort(key=lambda r: (-r.score, r.name))
-
         return candidates
 
-    def match_summary(self, hash_input: str) -> dict:
-        """
-        Returns a dict — useful later for JSON output mode.
-        """
-        results = self.match(hash_input)
+    def match_summary(self, hash_input: str,
+                      context: Optional[str] = None,
+                      hint: Optional[str] = None) -> dict:
+        results = self.match(hash_input, context, hint)
         return {
-            "input": hash_input,
-            "length": len(hash_input.strip()),
+            "input":      hash_input,
+            "length":     len(hash_input.strip()),
+            "context":    context or "none",
+            "hint":       hint or "none",
             "candidates": [
                 {
-                    "name": r.name,
-                    "score": r.score,
+                    "name":         r.name,
+                    "score":        r.score,
                     "hashcat_mode": r.hashcat_mode,
-                    "john_format": r.john_format,
-                    "description": r.description,
-                    "tags": r.tags,
+                    "john_format":  r.john_format,
+                    "description":  r.description,
+                    "tags":         r.tags,
                 }
                 for r in results
             ]
