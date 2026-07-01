@@ -82,7 +82,7 @@ python cli.py 5d41402abc4b2a76b9719d911017c592
 ```
 
 
-![[Pasted image 20260701125633.png]]
+![Output with color codec](images/output-with-color-codec.png)
 
 Color code:
 

@@ -49,7 +49,7 @@ Here, running a NTLM hash value (windows native hash) without the context gives 
 python cli.py 5d41402abc4b2a76b9719d911017c592
 ```
 
-![[Pasted image 20260630134022.png|697]]
+![Phase 2 without context](images/phase-2-without-context.png)
 
 Now, with the context:
 
@@ -57,7 +57,7 @@ Now, with the context:
 python cli.py --context windows 5d41402abc4b2a76b9719d911017c592
 ```
 
-![[Pasted image 20260630134129.png]]
+![Phase 2 with context](images/phase-2-with-context.png)
 
 Now with the context, NTLM overtake MD5 on a 32-char hex hash
 
@@ -67,7 +67,7 @@ With ctf context:
 python cli.py --context ctf 5d41402abc4b2a76b9719d911017c592
 ```
 
-![[Pasted image 20260630134606.png]]
+![Phase 2 context CTF](images/phase-2-context-ctf.png)
 
 ___
 
@@ -111,7 +111,7 @@ A SHA3-256 hash without context:
 python .\cli.py e167f68d6563d75bb25f3aa49c29ef612d41352dc00606de7cbd630bb2665f51
 ```
 
-![[Pasted image 20260630135713.png]]
+![Phase 2 bug SHA3-256 without context](images/phase-2-bug-sha3-256-without-context.png)
 
 With context:
 
@@ -119,7 +119,7 @@ With context:
 python .\cli.py --context ctf e167f68d6563d75bb25f3aa49c29ef612d41352dc00606de7cbd630bb2665f51
 ```
 
-![[Pasted image 20260630135840.png]]
+![Phase 2 bug SHA3-256 with context](images/phase-2-bug-sha3-256-with-context.png)
 ___
 
 ## What Context Does NOT Fix

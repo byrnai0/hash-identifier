@@ -31,7 +31,7 @@ produce 32 hex characters. The `weight` field is what separates them in
 ranking — which is why MD5 always comes out on top for a 32-char hex string.
 
 A sample snippet of the prototype functions in the file:
-![[Pasted image 20260625135747.png]]
+![Hash prototype function](images/hash-prototype-function.png)
 
 
 ### `matcher.py` — The Engine
@@ -120,7 +120,7 @@ $1$xyz12345$FPkBMmBpEXJghi3EBuTkR1
 
 ## What the Output Looks Like:
 
-![Hash prototype function](images/hash-prototype-function.png)
+![Phase 1 output](images/phase-1-output.png)
 
 The top result is always the most likely match based on real-world frequency.
 The Hashcat and John columns are directly usable if I ever need to crack the hash.

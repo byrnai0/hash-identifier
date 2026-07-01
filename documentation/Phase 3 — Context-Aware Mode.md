@@ -84,7 +84,7 @@ Example:
 python cli.py e167f68d6563d75bb25f3aa49c29ef612d41352dc00606de7cbd630bb2665f51
 ```
 
-![[Pasted image 20260630143357.png]]
+![Phase 3 without hint](images/phase-3-without-hint.png)
 
 - with ethereum hint:
 
@@ -92,7 +92,7 @@ python cli.py e167f68d6563d75bb25f3aa49c29ef612d41352dc00606de7cbd630bb2665f51
 python cli.py --hint ethereum e167f68d6563d75bb25f3aa49c29ef612d41352dc00606de7cbd630bb2665f51
 ```
 
-![[Pasted image 20260630143431.png]]
+![Phase 3 with hint](images/phase-3-with-hint.png)
 
 With the hint, we can also add context flag as well which increases the score of the hashes.
 
@@ -100,7 +100,7 @@ With the hint, we can also add context flag as well which increases the score of
 python cli.py --context windows --hint windows 5d41402abc4b2a76b9719d911017c592
 ```
 
-![[Pasted image 20260630143652.png]]
+![Phase 3 with context and hint](images/phase-3-with-context-and-hint.png)
 
 ___
 
@@ -134,7 +134,7 @@ python cli.py --file hashes.txt --context ctf --hint ethereum
 
 3. Expected output:
 
-![[Pasted image 20260630144404.png]]
+![Phase 3 text file output](images/phase-3-text-file-output.png)
 ___
 
 ## Fine-Tuning I Did After Testing
