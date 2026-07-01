@@ -120,7 +120,7 @@ $1$xyz12345$FPkBMmBpEXJghi3EBuTkR1
 
 ## What the Output Looks Like:
 
-![[Pasted image 20260625145534.png|697]]
+![Hash prototype function](images/hash-prototype-function.png)
 
 The top result is always the most likely match based on real-world frequency.
 The Hashcat and John columns are directly usable if I ever need to crack the hash.
